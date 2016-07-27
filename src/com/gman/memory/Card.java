@@ -2,7 +2,6 @@ package com.gman.memory;
 
 import java.awt.Dimension;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -29,6 +28,16 @@ public class Card extends JButton{
 			this.setIcon(img);
 		} else {
 			this.setIcon(null);
+		}
+	}
+	
+	//For resetting game, just change image without changing into a new card
+	public void newImage(int image) {
+		this.image = image;
+		try {
+			img = new ImageIcon(ImageIO.read(getClass().getResource("assets/" + image + ".jpg")));
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	

@@ -2,26 +2,18 @@ package com.gman.memory;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.Random;
-import java.util.concurrent.CountDownLatch;
 import java.util.stream.IntStream;
-
-import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
-import javax.swing.Timer;
 
 public class MemoryGUI {
 	JFrame frame;							  //Frame
@@ -32,6 +24,7 @@ public class MemoryGUI {
 	ImageIcon[] imgs = new ImageIcon[12];     //Icons for buttons
 	int selectedIndex = -1;					  //Current selected index (-1 if none)
 	int numOfSelected = 0;					  //Store number selected in order to end game
+	static MemoryGUI gui;
 	boolean finishedCleanup = true;
 	
 	public MemoryGUI() {
@@ -42,22 +35,8 @@ public class MemoryGUI {
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		
 		
-		/******* Create and Consolidate Index Array *******/
-		int[] index1 = IntStream.rangeClosed(0, 5).toArray();
-		int[] index2 = IntStream.rangeClosed(0, 5).toArray();
-		//Consolidate into one array of values
-		int[] indexes = new int[index1.length + index2.length];
-		System.arraycopy(index1, 0, indexes, 0, index1.length);
-		System.arraycopy(index2, 0, indexes, index1.length, index2.length);
-		
-		/******* Shuffle Indexes *******/
-		Random rand = new Random();
-		for (int i = indexes.length - 1; i > 0; i--) {
-			int pointer = rand.nextInt(i + 1);
-			int temp = indexes[pointer];
-			indexes[pointer] = indexes[i];
-			indexes[i] = temp;
-		}
+		/******* Get Idexes *******/
+		int[] indexes = getIndexes();
 		
 		/******* Assign Cards with Their Index *******/
 		for (int i = 0; i < cards.length; i++) {
@@ -110,6 +89,18 @@ public class MemoryGUI {
 											//Update label because you won
 											label.setText("You Win!");
 											label.setAlignmentX(Component.CENTER_ALIGNMENT);
+											//Restart program
+											int response = JOptionPane.showConfirmDialog(null, "Play Again?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+											//handle response
+											if (response == JOptionPane.NO_OPTION || response == JOptionPane.CLOSED_OPTION) {
+												//End program
+												System.exit(0);
+											} else {
+												//User wants to play again
+												frame.dispose();
+												frame.setVisible(false);
+												gui = new MemoryGUI();
+											}
 											repaint();
 										}
 									} else {
@@ -168,7 +159,29 @@ public class MemoryGUI {
 		frame.revalidate();
 	}
 	
+	//Get indexes
+	public int[] getIndexes() {
+		/******* Create and Consolidate Index Array *******/
+		int[] index1 = IntStream.rangeClosed(0, 5).toArray();
+		int[] index2 = IntStream.rangeClosed(0, 5).toArray();
+		//Consolidate into one array of values
+		int[] indexes = new int[index1.length + index2.length];
+		System.arraycopy(index1, 0, indexes, 0, index1.length);
+		System.arraycopy(index2, 0, indexes, index1.length, index2.length);
+		
+		/******* Shuffle Indexes *******/
+		Random rand = new Random();
+		for (int i = indexes.length - 1; i > 0; i--) {
+			int pointer = rand.nextInt(i + 1);
+			int temp = indexes[pointer];
+			indexes[pointer] = indexes[i];
+			indexes[i] = temp;
+		}
+		//Return indexes
+		return indexes;
+	}
+	
 	public static void main(String[] args) {
-		MemoryGUI gui = new MemoryGUI();
+		gui = new MemoryGUI();
 	}
 }
